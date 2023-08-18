@@ -1,16 +1,16 @@
 name: Build and Test CI for Pull Requests
 
 on:
-  pull_request:
-    branches: [ 'master', 'develop' ]
-  workflow_dispatch:
+  push:
+    branches: [ 'build-test' ]
 
 jobs:
-
   build-xenial:
-
-    runs-on: ubuntu-20.04
-
+    strategy:
+      matrix:
+        runs-on: [ubuntu-20.04, ubuntu-22.04, ubicloud-standard-2, ubicloud-standard-4, ubicloud-standard-8, ubicloud-standard-16]
+    name: CI ${{matrix.runs-on}}
+    runs-on: ${{matrix.runs-on}}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -23,34 +23,38 @@ jobs:
       run: ./scripts/docker/build.sh --xenial --remote
                                      astrobee test_astrobee
 
-  build-bionic:
+  # build-bionic:
+  #   strategy:
+  #     matrix:
+  #       runs-on: [ubuntu-20.04, ubuntu-22.04, ubicloud-standard-2, ubicloud-standard-4, ubicloud-standard-8, ubicloud-standard-16]
+  #   name: CI ${{matrix.runs-on}}
+  #   runs-on: ${{matrix.runs-on}}
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
 
-    runs-on: ubuntu-20.04
+  #   - name: Checkout submodule
+  #     run: git submodule update --init --depth 1 description/media
 
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+  #   - name: Build, test
+  #     run: ./scripts/docker/build.sh --bionic --remote
+  #                                    astrobee test_astrobee
 
-    - name: Checkout submodule
-      run: git submodule update --init --depth 1 description/media
+  # build-focal:
+  #   strategy:
+  #     matrix:
+  #       runs-on: [ubuntu-20.04, ubuntu-22.04, ubicloud-standard-2, ubicloud-standard-4, ubicloud-standard-8, ubicloud-standard-16]
+  #   name: CI ${{matrix.runs-on}}
+  #   runs-on: ${{matrix.runs-on}}
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
 
-    - name: Build, test
-      run: ./scripts/docker/build.sh --bionic --remote
-                                     astrobee test_astrobee
+  #   - name: Checkout submodule
+  #     run: git submodule update --init --depth 1 description/media
 
-  build-focal:
-
-    runs-on: ubuntu-20.04
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Checkout submodule
-      run: git submodule update --init --depth 1 description/media
-
-    - name: Build, test
-      run: ./scripts/docker/build.sh --focal --remote
-                                     astrobee test_astrobee
+  #   - name: Build, test
+  #     run: ./scripts/docker/build.sh --focal --remote
+  #                                    astrobee test_astrobee
